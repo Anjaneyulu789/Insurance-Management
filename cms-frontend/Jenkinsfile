@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    git url: 'https://github.com/rohithraj25/working.git'
+                    def microservices = [
+                        'cms-frontend'
+                    ]
+                    microservices.each { serviceDir ->
+                        echo "Checked out ${serviceDir}"
+                    }
+                }
+            }
+        }
+        stage('Build NPM Project') {
+            steps {
+                script {
+                    dir('cms-frontend') {
+                        echo "Building NPM project cms-frontend"
+                        sh 'npm install'
+                        sh 'npm run build'
+                    }
+                }
+            }
+        }
+
+        stage('Build frontend Docker Image') {
+            steps {
+                script {
+                    dir('cms-frontend') {
+                        def imageTag = "cms-frontend:${env.BUILD_ID}" // Tagging with build ID
+                        echo "Building Docker image: ${imageTag}"
+                        sh "docker build -t ${imageTag} ."
+                    }
+                }
+            }
+        }
+
+        stage('Cleanup Previous Container') {
+            steps {
+                script {
+                    sh 'docker rm -f cms-frontend || true'
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                script {
+                    def imageTag = "cms-frontend:${env.BUILD_ID}" // Tagging with build ID
+                    echo "Starting Docker container: ${imageTag}"
+                    sh "docker run -d --name cms-frontend -p 3000:3000 ${imageTag}"
+                }
+            }
+        }
+    }
+}
+
