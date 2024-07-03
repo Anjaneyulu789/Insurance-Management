@@ -1,5 +1,12 @@
 pipeline {
     agent any
+    environment {
+        dockerHubUsername = 'rohithraj25'  
+        dockerImageTag = "${dockerHubUsername}/user-service:latest"
+        DOCKER_REGISTRY = "https://index.docker.io/v1/"
+        DOCKER_CREDENTIALS_ID = "dockerID"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -76,6 +83,27 @@ pipeline {
 
                     // Run Docker container
                     sh "docker run -d --name ${containerName} -p 9000:9000 ${dockerImageTag}"
+                }
+            }
+        }
+         stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry(env.DOCKER_REGISTRY, env.DOCKER_CREDENTIALS_ID) {
+                        def dockerImage = docker.image(dockerImageTag)
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+
+        stage('Pull Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry(env.DOCKER_REGISTRY, env.DOCKER_CREDENTIALS_ID) {
+                        def dockerImage = docker.image(dockerImageTag)
+                        dockerImage.pull()
+                    }
                 }
             }
         }
