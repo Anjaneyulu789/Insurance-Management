@@ -4,7 +4,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    git url: 'https://github.com/rohithraj25/working.git'
+                    git url: 'https://github.com/rohithraj25/Insurance-Management.git'
                     def microservices = [
                         'working/cms-service-registry'
                     ]
