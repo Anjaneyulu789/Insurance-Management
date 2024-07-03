@@ -5,7 +5,7 @@ pipeline {
             steps {
                 script {
                     // Clone the main repository
-                    git url: 'https://github.com/rohithraj25/working.git'
+                    git url: 'https://github.com/rohithraj25/Insurance-Management.git'
 
                     // List of microservices directories within the main repository
                     def microservices = [
