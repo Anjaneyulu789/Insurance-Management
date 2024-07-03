@@ -71,7 +71,6 @@ pipeline {
                 }
             }
         }
-
         stage('Pull Docker Image') {
             steps {
                 script {
