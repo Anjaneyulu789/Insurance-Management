@@ -37,6 +37,17 @@ pipeline {
                 }
             }
         }
+stage('Clean Previous Images') {
+            steps {
+                script {
+                    def imageName = "${dockerImageTag}/user-service"
+
+                    sh """
+                    docker images | grep '${imageName}' | awk '{print \$3}' | xargs -r docker rmi -f
+                    """
+                }
+            }
+        }
 
         stage('Build Docker Image') {
             steps {
